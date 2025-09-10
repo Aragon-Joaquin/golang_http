@@ -38,13 +38,26 @@ CONSTRAINT fk_comments_users
 );
 
 --
--- CREATE PROCEDURES!!!
---
+-- using functions, since procedures are a pain to return something
+-- prepare queries only live for a certain time in the current session
 
-create procedure CreateUser (u varchar, e varchar)
-LANGUAGE sql AS $$
-INSERT INTO users(username,email) VALUES (u,e);
-$$;
+drop function if exists CreateUser;
 
--- example
--- CALL CreateUser('golang_lover', 'haskell@husking.hosk');
+CREATE FUNCTION CreateUser (_username VARCHAR, _email VARCHAR)
+ RETURNS TABLE (
+  id INTEGER,
+  username VARCHAR,
+  email VARCHAR
+ ) -- we specify the type of what we return. could be SETOF users if we return the entire table
+  LANGUAGE plpgsql  AS
+$func$
+BEGIN
+	RETURN QUERY -- we return this result
+      INSERT INTO users(username, email)
+      VALUES (_username, _email)
+      RETURNING username,email;
+END
+$func$;
+
+SELECT * FROM CreateUser('angular_supporter12', 'htmx12@htmx.com');
+

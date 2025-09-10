@@ -1,4 +1,4 @@
-package server
+package main
 
 import (
 	"fmt"
@@ -10,20 +10,24 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 
 	"golang-http/internal/database"
+	"golang-http/internal/models"
 )
 
 type Server struct {
 	port int
 
-	db database.Service
+	storage models.ModelsStorageStruct
+	db      *database.Service
 }
 
 func NewServer() *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
-	NewServer := &Server{
-		port: port,
 
-		db: database.New(),
+	databaseServ := database.New()
+	NewServer := &Server{
+		port:    port,
+		storage: *models.ModelsStorage(databaseServ.Db),
+		db:      databaseServ,
 	}
 
 	// Declare Server config

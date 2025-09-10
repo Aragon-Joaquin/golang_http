@@ -12,6 +12,8 @@ i used go-blueprint to give me a hand on the project structure
 - [ ] websockets
 - [ ] redis cache
 - [ ] migrations
+- [ ] logger
+- [ ] jwt/authentication
 
 **db name**: testgodb (yes, thats the name)
 
@@ -50,3 +52,5 @@ psql YOUR-DB-NAME!!
 5. useful commands when using the shell on a shell on a shell i really dont have any idea why is like that
 
 - \dt: show tables
+
+## or just use dbeaver
