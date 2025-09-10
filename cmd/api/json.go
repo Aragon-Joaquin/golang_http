@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -14,14 +15,15 @@ type response struct {
 // general func
 func writeJSON(w http.ResponseWriter, status int, data any) error {
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
 
 	if err := json.NewEncoder(w).Encode(data); err != nil {
+		fmt.Println("is error: ", err)
 		writeJSON(w, http.StatusInternalServerError, &response{Message: err.Error(), Error: true})
 		log.Fatalf("error handling JSON marshal. Err: %v", err)
 		return err
 	}
 
-	w.WriteHeader(status)
 	return nil
 }
 

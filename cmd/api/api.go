@@ -8,6 +8,11 @@ import (
 	"github.com/go-chi/cors"
 )
 
+var (
+	ErrorSpecifyAPIVer = "Please specify the version of the api."
+	IncorrectPath      = "The path provided is not valid. Maybe it could be a wrong HTTP Method?"
+)
+
 func (s *Server) RegisterRoutes() http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -25,12 +30,16 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 		//  routes for /v1/user
 		r.Route("/user", func(r chi.Router) {
-			r.Get("/create", s.createUser)
+			r.Post("/", s.createUser)
+		})
+
+		r.NotFound(func(w http.ResponseWriter, r *http.Request) {
+			s.WriteJSONError(w, http.StatusNotFound, IncorrectPath)
 		})
 	})
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
-		s.WriteJSONError(w, http.StatusNotFound, "Please specify the version of the api.")
+		s.WriteJSONError(w, http.StatusNotFound, ErrorSpecifyAPIVer)
 	})
 
 	return r

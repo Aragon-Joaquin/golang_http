@@ -19,6 +19,7 @@ func (s *Server) createUser(w http.ResponseWriter, r *http.Request) {
 		default:
 			s.WriteJSONError(w, http.StatusInternalServerError, err.Error())
 		}
+		return
 	}
 
 	if err := s.WriteJSONDataField(w, http.StatusCreated, user); err != nil {
