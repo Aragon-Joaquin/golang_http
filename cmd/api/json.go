@@ -2,14 +2,13 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 )
 
 type response struct {
-	Message string `json:"message"`
-	Error   bool   `json:"error"`
+	Message any  `json:"message"`
+	Error   bool `json:"error"`
 }
 
 // general func
@@ -18,7 +17,6 @@ func writeJSON(w http.ResponseWriter, status int, data any) error {
 	w.WriteHeader(status)
 
 	if err := json.NewEncoder(w).Encode(data); err != nil {
-		fmt.Println("is error: ", err)
 		writeJSON(w, http.StatusInternalServerError, &response{Message: err.Error(), Error: true})
 		log.Fatalf("error handling JSON marshal. Err: %v", err)
 		return err
@@ -28,7 +26,7 @@ func writeJSON(w http.ResponseWriter, status int, data any) error {
 }
 
 // methods for server.
-func (s *Server) WriteJSONError(w http.ResponseWriter, status int, message string) error {
+func (s *Server) WriteJSONError(w http.ResponseWriter, status int, message any) error {
 	return writeJSON(w, status, &response{Message: message, Error: true})
 }
 
