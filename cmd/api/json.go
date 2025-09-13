@@ -7,8 +7,8 @@ import (
 )
 
 type response struct {
-	Message any  `json:"message"`
-	Error   bool `json:"error"`
+	Data  any  `json:"data"`
+	Error bool `json:"error"`
 }
 
 // general func
@@ -17,7 +17,7 @@ func writeJSON(w http.ResponseWriter, status int, data any) error {
 	w.WriteHeader(status)
 
 	if err := json.NewEncoder(w).Encode(data); err != nil {
-		writeJSON(w, http.StatusInternalServerError, &response{Message: err.Error(), Error: true})
+		writeJSON(w, http.StatusInternalServerError, &response{Data: err.Error(), Error: true})
 		log.Fatalf("error handling JSON marshal. Err: %v", err)
 		return err
 	}
@@ -27,20 +27,11 @@ func writeJSON(w http.ResponseWriter, status int, data any) error {
 
 // methods for server.
 func (s *Server) WriteJSONError(w http.ResponseWriter, status int, message any) error {
-	return writeJSON(w, status, &response{Message: message, Error: true})
+	return writeJSON(w, status, &response{Data: message, Error: true})
 }
 
-func (s *Server) WriteJSON(w http.ResponseWriter, status int, message string) error {
-	return writeJSON(w, status, &response{Message: message, Error: false})
-}
-
-func (s *Server) WriteJSONDataField(w http.ResponseWriter, status int, data any) error {
-	type responseData struct {
-		Data  any  `json:"data"`
-		Error bool `json:"error"`
-	}
-
-	return writeJSON(w, status, &responseData{Data: data, Error: false})
+func (s *Server) WriteJSON(w http.ResponseWriter, status int, message any) error {
+	return writeJSON(w, status, &response{Data: message, Error: false})
 }
 
 // decode/read
@@ -51,6 +42,5 @@ func (s *Server) ReadJSON(w http.ResponseWriter, r *http.Request, data any) erro
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
 
-	//! need to return the readed data as well
 	return decoder.Decode(data)
 }

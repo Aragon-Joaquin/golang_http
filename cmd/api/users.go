@@ -8,23 +8,33 @@ import (
 
 func (s *Server) createUser(w http.ResponseWriter, r *http.Request) {
 
-	//TODO: this wont return the json data
 	var userInfo d.UserSchema
-	s.ReadJSON(w, r, userInfo)
+	if err := s.ReadJSON(w, r, &userInfo); err != nil {
+		s.WriteJSONError(w, http.StatusBadRequest, models.ErrMsg_JSONReading)
+		return
+	}
 
 	user, err := s.storage.User.Create(r.Context(), &userInfo)
 
 	if err != nil {
 		switch err.Message {
-		case models.ErrNotFound.Error():
+		case models.ErrMsg_QueryTimeout:
+			s.WriteJSONError(w, http.StatusRequestTimeout, err)
+		case models.ErrMsg_NotFound:
 			s.WriteJSONError(w, http.StatusNotFound, err)
+		case models.ErrMsg_DBConflict:
+			s.WriteJSONError(w, http.StatusConflict, err)
+		case models.ErrMsg_OnValidations:
+			s.WriteJSONError(w, http.StatusBadRequest, err)
+		case models.ErrMsg_UndefinedCol:
+			s.WriteJSONError(w, http.StatusBadRequest, err)
 		default:
-			s.WriteJSONError(w, http.StatusInternalServerError, err)
+			s.WriteJSONError(w, http.StatusNotImplemented, err)
 		}
 		return
 	}
 
-	if err := s.WriteJSONDataField(w, http.StatusCreated, user); err != nil {
+	if err := s.WriteJSON(w, http.StatusCreated, user); err != nil {
 		s.WriteJSONError(w, http.StatusInternalServerError, err.Error())
 	}
 }

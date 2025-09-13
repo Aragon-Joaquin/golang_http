@@ -3,7 +3,7 @@ package models
 import (
 	"context"
 	"database/sql"
-	"errors"
+	"reflect"
 	"time"
 
 	d "golang-http/internal/dtos"
@@ -12,9 +12,7 @@ import (
 )
 
 var (
-	ErrNotFound          = errors.New("resource not found")
-	ErrConflict          = errors.New("resource already exists")
-	QueryTimeoutDuration = time.Second * 5
+	ContextMaxTimeout = 3 * time.Second
 )
 
 type ModelsStorageStruct struct {
@@ -30,6 +28,12 @@ type ErrorsStruct struct {
 
 func ModelsStorage(db *sql.DB) *ModelsStorageStruct {
 	validate := validator.New(validator.WithRequiredStructEnabled())
+
+	// uses the "name:''" tag in the struct as the name field
+	validate.RegisterTagNameFunc(func(field reflect.StructField) string {
+		return field.Tag.Get("name")
+	})
+
 	return &ModelsStorageStruct{
 		User: &UserStore{db: db, val: validate},
 	}

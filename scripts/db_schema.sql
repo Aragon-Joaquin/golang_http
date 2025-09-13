@@ -55,9 +55,8 @@ BEGIN
 	RETURN QUERY -- we return this result
       INSERT INTO users(username, email)
       VALUES (_username, _email)
-      RETURNING username,email;
+      RETURNING users.id, users.username, users.email;
 END
 $func$;
 
-SELECT * FROM CreateUser('angular_supporter12', 'htmx12@htmx.com');
-
+-- SELECT * FROM CreateUser('angular_supporter12', 'htmx12@htmx.com');

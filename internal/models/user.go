@@ -20,11 +20,14 @@ type UserStore struct {
 
 // ! create user
 type createUser struct {
-	Username string `json:"username" validate:"required,max=20,min=3"`
-	Email    string `json:"email" validate:"required,email,max=50,min=3"`
+	Username string `validate:"required,max=20,min=3" name:"username"`
+	Email    string `validate:"required,email,max=50,min=3" name:"email"`
 }
 
 func (s *UserStore) Create(ctx context.Context, user *d.UserSchema) (*d.UserSchema, *ErrorsStruct) {
+	ctx, cancel := context.WithTimeout(ctx, ContextMaxTimeout)
+	defer cancel()
+
 	userCreate := createUser{Username: user.Username, Email: user.Email}
 	err := s.val.Struct(userCreate)
 
@@ -38,19 +41,10 @@ func (s *UserStore) Create(ctx context.Context, user *d.UserSchema) (*d.UserSche
 	args := []any{userCreate.Username, userCreate.Email}
 	var newUser d.UserSchema
 
-	// 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
-	// defer cancel()
-
 	err = s.db.QueryRowContext(ctx, query, args...).Scan(&newUser.Id, &newUser.Username, &newUser.Email)
+
 	if err != nil {
-		switch {
-		case err.Error() == `pq: duplicate key value violates unique constraint "email"`:
-			return nil, &ErrorsStruct{Message: ErrDuplicateEmail}
-		case err.Error() == `pq: duplicate key value violates unique constraint "username"`:
-			return nil, &ErrorsStruct{Message: ErrDuplicateUsername}
-		default:
-			return nil, &ErrorsStruct{Message: err.Error()}
-		}
+		return nil, CheckForGenericErrors(err)
 	}
 
 	return &d.UserSchema{Id: newUser.Id, Username: newUser.Username, Email: newUser.Email}, nil
