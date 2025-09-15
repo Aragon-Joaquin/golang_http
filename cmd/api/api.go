@@ -31,18 +31,22 @@ func (s *Server) RegisterRoutes() http.Handler {
 	}))
 
 	r.Route("/v1", func(r chi.Router) {
-		r.Get("/health", s.HealthHandler)
-
-		//  routes for /v1/user
-		r.Route("/user", func(r chi.Router) {
-			r.Use(s.AuthMiddleware)
-
-			r.Get("/{id}", s.getUser)
-		})
-
 		r.Route("/auth", func(r chi.Router) {
 			r.Post("/user", s.registerUser)
 			// r.Post("/token", func(w http.ResponseWriter, r *http.Request) {})
+		})
+
+		//! from this point on, every route is protected
+		r.Group(func(r chi.Router) {
+			r.Use(s.AuthMiddleware)
+
+			r.Get("/health", s.HealthHandler)
+
+			//  routes for /v1/user
+			r.Route("/user", func(r chi.Router) {
+				r.Get("/", s.getOwnUser)
+				r.Get("/{id}", s.getUser)
+			})
 		})
 
 		r.NotFound(func(w http.ResponseWriter, r *http.Request) {

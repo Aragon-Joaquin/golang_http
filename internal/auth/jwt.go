@@ -74,7 +74,6 @@ func (j *JWTAuthenticator) ValidateToken(token string) (*jwt.Token, error) {
 	)
 
 	if err != nil {
-		fmt.Println("what", err)
 		switch strings.Split(err.Error(), ":")[0] {
 		case jwt.ErrTokenMalformed.Error():
 			return nil, errors.New("jwt unable to parse, invalid jwt interface")

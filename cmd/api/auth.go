@@ -22,20 +22,7 @@ func (s *Server) registerUser(w http.ResponseWriter, r *http.Request) {
 	user, err := s.storage.User.Create(r.Context(), &userInfo)
 
 	if err != nil {
-		switch err.Message {
-		case er.QueryTimeout:
-			s.WriteJSONError(w, http.StatusRequestTimeout, err)
-		case er.NotFound:
-			s.WriteJSONError(w, http.StatusNotFound, err)
-		case er.DBConflict:
-			s.WriteJSONError(w, http.StatusConflict, err)
-		case er.OnValidations:
-			s.WriteJSONError(w, http.StatusBadRequest, err)
-		case er.UndefinedCol:
-			s.WriteJSONError(w, http.StatusBadRequest, err)
-		default:
-			s.WriteJSONError(w, http.StatusNotImplemented, err)
-		}
+		s.WriteJSONError(w, er.MatchErrorCodes(err.Message), err)
 		return
 	}
 

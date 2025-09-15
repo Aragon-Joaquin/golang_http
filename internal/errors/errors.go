@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
+	"net/http"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
@@ -72,4 +74,29 @@ func CheckForGenericErrors(err error) *ErrorsStruct {
 		return &ErrorsStruct{Message: Unknown}
 	}
 
+}
+
+func MatchErrorCodes(message any) int {
+	errMsg, ok := message.(errIdentifier)
+
+	if !ok {
+		//check if the type pgConnErrorCode its thrown here
+		log.Printf("bad status in MatchErrorCodes: %s", message)
+		return http.StatusTeapot
+	}
+
+	switch errMsg {
+	case QueryTimeout:
+		return http.StatusRequestTimeout
+	case NotFound:
+		return http.StatusNotFound
+	case DBConflict:
+		return http.StatusConflict
+	case OnValidations:
+		return http.StatusBadRequest
+	case UndefinedCol:
+		return http.StatusBadRequest
+	default:
+		return http.StatusNotImplemented
+	}
 }
