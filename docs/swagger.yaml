@@ -1,0 +1,59 @@
+definitions:
+  er.ErrorsStruct:
+    properties:
+      message: {}
+      validationsErrors:
+        additionalProperties:
+          type: string
+        type: object
+    type: object
+  handlers.UserSchema:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      username:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /users/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Fetches a user profile by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.UserSchema'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/er.ErrorsStruct'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/er.ErrorsStruct'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/er.ErrorsStruct'
+      security:
+      - ApiKeyAuth: []
+      summary: Fetches a user profile
+      tags:
+      - users
+swagger: "2.0"

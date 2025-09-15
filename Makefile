@@ -61,4 +61,8 @@ watch:
             fi; \
         fi
 
-.PHONY: all build run test clean watch docker-run docker-down itest
+#Make documentation
+gen-docs:
+	@swag init -g ./main.go -d ./cmd/api,./internal/dtos,./internal/errors -o ./docs && swag fmt
+
+.PHONY: all build run test clean watch docker-run docker-down itest gen-docs

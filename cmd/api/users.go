@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
-	d "golang-http/internal/dtos"
 	er "golang-http/internal/errors"
 	"net/http"
 	"strconv"
+
+	d "golang-http/internal/dtos"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -14,7 +14,21 @@ type userKey string
 
 const userCtx userKey = "userIdentifier"
 
-// ! get user
+// !test
+// GetUser godoc
+//
+//	@Summary		Fetches a user profile
+//	@Description	Fetches a user profile by ID
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int	true	"User ID"
+//	@Success		200	{object}	d.UserSchema
+//	@Failure		400	{object}	er.ErrorsStruct
+//	@Failure		404	{object}	er.ErrorsStruct
+//	@Failure		500	{object}	er.ErrorsStruct
+//	@Security		ApiKeyAuth
+//	@Router			/v1/users/{id} [get]
 func (s *Server) getUser(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 
@@ -26,7 +40,6 @@ func (s *Server) getUser(w http.ResponseWriter, r *http.Request) {
 	user, err2 := s.storage.User.Get(r.Context(), id)
 
 	if err2 != nil {
-		fmt.Println(err2)
 		s.WriteJSONError(w, er.MatchErrorCodes(err2.Message), err2)
 		return
 	}

@@ -3,17 +3,17 @@ i used go-blueprint to give me a hand on the project structure
 ## USING/doing to do:
 
 - chi for a more easy and lightweight routing
-- [ ] psql connection
+- [x] psql connection
 - [ ] kafka
 - [ ] elastic search
-- [ ] swagger
+- [ ] swagger < **Doing** 🚧
 - [ ] ratelimiter
 - [ ] docker
 - [ ] websockets
 - [ ] redis cache
 - [ ] migrations
 - [ ] logger
-- [ ] jwt/authentication
+- [x] jwt/authentication
 
 **db name**: testgodb (yes, thats the name)
 
