@@ -26,6 +26,7 @@ func writeJSON(w http.ResponseWriter, status int, data any) error {
 }
 
 // methods for server.
+
 func (s *Server) WriteJSONError(w http.ResponseWriter, status int, message any) error {
 	return writeJSON(w, status, &response{Data: message, Error: true})
 }

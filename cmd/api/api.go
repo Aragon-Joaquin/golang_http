@@ -15,7 +15,11 @@ var (
 
 func (s *Server) RegisterRoutes() http.Handler {
 	r := chi.NewRouter()
+
+	r.Use(middleware.RequestID) //adds a unique counter for each request
+	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer) // recovers from panics, logs the panic, and returns a 500 status if possible
 
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
@@ -30,7 +34,14 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 		//  routes for /v1/user
 		r.Route("/user", func(r chi.Router) {
-			r.Post("/", s.createUser)
+			r.Use(s.AuthMiddleware)
+
+			r.Get("/{id}", s.getUser)
+		})
+
+		r.Route("/auth", func(r chi.Router) {
+			r.Post("/user", s.registerUser)
+			// r.Post("/token", func(w http.ResponseWriter, r *http.Request) {})
 		})
 
 		r.NotFound(func(w http.ResponseWriter, r *http.Request) {

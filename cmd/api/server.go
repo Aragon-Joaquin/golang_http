@@ -9,6 +9,7 @@ import (
 
 	_ "github.com/joho/godotenv/autoload"
 
+	"golang-http/internal/auth"
 	"golang-http/internal/database"
 	"golang-http/internal/models"
 )
@@ -16,8 +17,9 @@ import (
 type Server struct {
 	port int
 
-	storage models.ModelsStorageStruct
-	db      *database.Service
+	storage       models.ModelsStorageStruct
+	db            *database.Service
+	authenticator auth.Authenticator
 }
 
 func newServer() *http.Server {
@@ -25,9 +27,10 @@ func newServer() *http.Server {
 
 	databaseServ := database.New()
 	NewServer := &Server{
-		port:    port,
-		storage: *models.ModelsStorage(databaseServ.Db),
-		db:      databaseServ,
+		port:          port,
+		storage:       *models.ModelsStorage(databaseServ.Db),
+		db:            databaseServ,
+		authenticator: auth.NewJWTAuthenticator(),
 	}
 
 	// Declare Server config

@@ -29,9 +29,8 @@ func (s *UserStore) Create(ctx context.Context, user *d.UserSchema) (*d.UserSche
 	defer cancel()
 
 	userCreate := createUser{Username: user.Username, Email: user.Email}
-	err := s.val.Struct(userCreate)
 
-	if err != nil {
+	if err := s.val.Struct(userCreate); err != nil {
 		return nil, ValidatorErrorParser(err)
 	}
 
@@ -41,7 +40,7 @@ func (s *UserStore) Create(ctx context.Context, user *d.UserSchema) (*d.UserSche
 	args := []any{userCreate.Username, userCreate.Email}
 	var newUser d.UserSchema
 
-	err = s.db.QueryRowContext(ctx, query, args...).Scan(&newUser.Id, &newUser.Username, &newUser.Email)
+	err := s.db.QueryRowContext(ctx, query, args...).Scan(&newUser.Id, &newUser.Username, &newUser.Email)
 
 	if err != nil {
 		return nil, CheckForGenericErrors(err)
@@ -50,4 +49,31 @@ func (s *UserStore) Create(ctx context.Context, user *d.UserSchema) (*d.UserSche
 	return &d.UserSchema{Id: newUser.Id, Username: newUser.Username, Email: newUser.Email}, nil
 }
 
-//! get user
+// ! get user
+type getUser struct {
+	Id int64 `validate:"required,number,gt=0" name:"id"`
+}
+
+func (s *UserStore) Get(ctx context.Context, id int64) (*d.UserSchema, *ErrorsStruct) {
+	ctx, cancel := context.WithTimeout(ctx, ContextMaxTimeout)
+	defer cancel()
+
+	userGet := getUser{Id: id}
+
+	if err := s.val.Struct(userGet); err != nil {
+		return nil, ValidatorErrorParser(err)
+	}
+
+	query := `
+		SELECT id, username, email, created_at FROM users WHERE id = $1;
+	`
+	args := []any{userGet.Id}
+	var newUser d.UserSchema
+	err := s.db.QueryRowContext(ctx, query, args...).Scan(&newUser.Id, &newUser.Username, &newUser.Email, &newUser.Created_at)
+
+	if err != nil {
+		return nil, CheckForGenericErrors(err)
+	}
+
+	return &d.UserSchema{Id: newUser.Id, Username: newUser.Username, Email: newUser.Email, Created_at: newUser.Created_at}, nil
+}

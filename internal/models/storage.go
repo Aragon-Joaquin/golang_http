@@ -18,6 +18,7 @@ var (
 type ModelsStorageStruct struct {
 	User interface {
 		Create(context.Context, *d.UserSchema) (*d.UserSchema, *ErrorsStruct)
+		Get(context.Context, int64) (*d.UserSchema, *ErrorsStruct)
 	}
 }
 
