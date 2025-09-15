@@ -1,6 +1,7 @@
 package main
 
 import (
+	er "golang-http/internal/errors"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -9,8 +10,8 @@ import (
 )
 
 var (
-	ErrorSpecifyAPIVer = "Please specify the version of the api."
-	IncorrectPath      = "The path provided is not valid. Maybe it could be a wrong HTTP Method?"
+	errorSpecifyAPIVer = "Please specify the version of the api."
+	incorrectPath      = "The path provided is not valid. Maybe it could be a wrong HTTP Method?"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
@@ -45,12 +46,12 @@ func (s *Server) RegisterRoutes() http.Handler {
 		})
 
 		r.NotFound(func(w http.ResponseWriter, r *http.Request) {
-			s.WriteJSONError(w, http.StatusNotFound, IncorrectPath)
+			s.WriteJSONError(w, http.StatusNotFound, &er.ErrorsStruct{Message: incorrectPath})
 		})
 	})
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
-		s.WriteJSONError(w, http.StatusNotFound, ErrorSpecifyAPIVer)
+		s.WriteJSONError(w, http.StatusNotFound, &er.ErrorsStruct{Message: errorSpecifyAPIVer})
 	})
 
 	return r

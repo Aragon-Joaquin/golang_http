@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	d "golang-http/internal/dtos"
+	e "golang-http/internal/errors"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -24,14 +25,14 @@ type createUser struct {
 	Email    string `validate:"required,email,max=50,min=3" name:"email"`
 }
 
-func (s *UserStore) Create(ctx context.Context, user *d.UserSchema) (*d.UserSchema, *ErrorsStruct) {
+func (s *UserStore) Create(ctx context.Context, user *d.UserSchema) (*d.UserSchema, *e.ErrorsStruct) {
 	ctx, cancel := context.WithTimeout(ctx, ContextMaxTimeout)
 	defer cancel()
 
 	userCreate := createUser{Username: user.Username, Email: user.Email}
 
 	if err := s.val.Struct(userCreate); err != nil {
-		return nil, ValidatorErrorParser(err)
+		return nil, e.ValidatorErrorParser(err)
 	}
 
 	query := `
@@ -43,7 +44,7 @@ func (s *UserStore) Create(ctx context.Context, user *d.UserSchema) (*d.UserSche
 	err := s.db.QueryRowContext(ctx, query, args...).Scan(&newUser.Id, &newUser.Username, &newUser.Email)
 
 	if err != nil {
-		return nil, CheckForGenericErrors(err)
+		return nil, e.CheckForGenericErrors(err)
 	}
 
 	return &d.UserSchema{Id: newUser.Id, Username: newUser.Username, Email: newUser.Email}, nil
@@ -54,14 +55,14 @@ type getUser struct {
 	Id int64 `validate:"required,number,gt=0" name:"id"`
 }
 
-func (s *UserStore) Get(ctx context.Context, id int64) (*d.UserSchema, *ErrorsStruct) {
+func (s *UserStore) Get(ctx context.Context, id int64) (*d.UserSchema, *e.ErrorsStruct) {
 	ctx, cancel := context.WithTimeout(ctx, ContextMaxTimeout)
 	defer cancel()
 
 	userGet := getUser{Id: id}
 
 	if err := s.val.Struct(userGet); err != nil {
-		return nil, ValidatorErrorParser(err)
+		return nil, e.ValidatorErrorParser(err)
 	}
 
 	query := `
@@ -72,7 +73,7 @@ func (s *UserStore) Get(ctx context.Context, id int64) (*d.UserSchema, *ErrorsSt
 	err := s.db.QueryRowContext(ctx, query, args...).Scan(&newUser.Id, &newUser.Username, &newUser.Email, &newUser.Created_at)
 
 	if err != nil {
-		return nil, CheckForGenericErrors(err)
+		return nil, e.CheckForGenericErrors(err)
 	}
 
 	return &d.UserSchema{Id: newUser.Id, Username: newUser.Username, Email: newUser.Email, Created_at: newUser.Created_at}, nil

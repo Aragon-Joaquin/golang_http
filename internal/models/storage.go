@@ -7,6 +7,7 @@ import (
 	"time"
 
 	d "golang-http/internal/dtos"
+	e "golang-http/internal/errors"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -17,14 +18,9 @@ var (
 
 type ModelsStorageStruct struct {
 	User interface {
-		Create(context.Context, *d.UserSchema) (*d.UserSchema, *ErrorsStruct)
-		Get(context.Context, int64) (*d.UserSchema, *ErrorsStruct)
+		Create(context.Context, *d.UserSchema) (*d.UserSchema, *e.ErrorsStruct)
+		Get(context.Context, int64) (*d.UserSchema, *e.ErrorsStruct)
 	}
-}
-
-type ErrorsStruct struct {
-	Validations map[string]string `json:"validationsErrors,omitempty"`
-	Message     string            `json:"message"`
 }
 
 func ModelsStorage(db *sql.DB) *ModelsStorageStruct {
