@@ -63,6 +63,6 @@ watch:
 
 #Make documentation
 gen-docs:
-	@swag init -g ./main.go -d ./cmd/api,./internal/dtos,./internal/errors -o ./docs && swag fmt
+	@swag init -g ./main.go -d ./cmd/api,./internal/dtos,./internal/errors,./internal/models -o ./docs && swag fmt
 
 .PHONY: all build run test clean watch docker-run docker-down itest gen-docs
