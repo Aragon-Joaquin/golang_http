@@ -34,3 +34,4 @@ main
 
 # custom
 go.sum
+docs/*
