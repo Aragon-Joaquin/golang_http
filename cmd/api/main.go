@@ -35,24 +35,6 @@ func gracefulShutdown(apiServer *http.Server, done chan bool) {
 	done <- true
 }
 
-//	@title			golang-http
-//	@description	A simple server, using a bunch of repos (linked in the readme.md) to guide myself into the backend world
-//	@termsOfService	http://swagger.io/terms/
-
-//	@contact.name	API Support
-//	@contact.url	http://www.swagger.io/support
-//	@contact.email	support@swagger.io
-
-//	@license.name	MIT ???
-//	@license.url	https://opensource.org/license/mit
-
-//	@BasePath	/v1
-
-//	@securityDefinitions.apikey	ApiKeyAuth
-//	@in							header
-//	@name						Authorization
-//	@description
-
 func main() {
 	server := newServer()
 

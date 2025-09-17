@@ -17,15 +17,6 @@ type ErrorsStruct struct {
 	Message     any               `json:"message"`
 }
 
-// ! just a swagegr placeholder until i fix this somehow
-type ReturnedError struct {
-	Data struct {
-		Validations map[string]string `json:"validationsErrors,omitempty"`
-		Message     string            `json:"message"`
-	} `json:"data"`
-	Error bool `json:"error"`
-}
-
 func ValidatorErrorParser(err error) *ErrorsStruct {
 	var validateErrs validator.ValidationErrors
 	errMessages := make(map[string]string)

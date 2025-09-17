@@ -7,8 +7,8 @@ import (
 	"net/http"
 )
 
-type DataResponse[T any] struct {
-	Data  T    `json:"data"`
+type response struct {
+	Data  any  `json:"data"`
 	Error bool `json:"error"`
 }
 
@@ -18,7 +18,7 @@ func writeJSON(w http.ResponseWriter, status int, data any) error {
 	w.WriteHeader(status)
 
 	if err := json.NewEncoder(w).Encode(data); err != nil {
-		writeJSON(w, http.StatusInternalServerError, &DataResponse[any]{Data: err.Error(), Error: true})
+		writeJSON(w, http.StatusInternalServerError, &response{Data: err.Error(), Error: true})
 		log.Fatalf("error handling JSON marshal. Err: %v", err)
 		return err
 	}
@@ -29,11 +29,11 @@ func writeJSON(w http.ResponseWriter, status int, data any) error {
 // methods for server.
 
 func (s *Server) WriteJSONError(w http.ResponseWriter, status int, message *err.ErrorsStruct) error {
-	return writeJSON(w, status, &DataResponse[*err.ErrorsStruct]{Data: message, Error: true})
+	return writeJSON(w, status, &response{Data: message, Error: true})
 }
 
 func (s *Server) WriteJSON(w http.ResponseWriter, status int, message any) error {
-	return writeJSON(w, status, &DataResponse[any]{Data: message, Error: false})
+	return writeJSON(w, status, &response{Data: message, Error: false})
 }
 
 // decode/read

@@ -20,7 +20,6 @@ type ModelsStorageStruct struct {
 	User interface {
 		Create(context.Context, *d.UserSchema) (*d.UserSchema, *e.ErrorsStruct)
 		Get(context.Context, int64) (*d.UserSchema, *e.ErrorsStruct)
-		GetByCredentials(ctx context.Context, user *d.UserSchema) (*d.UserSchema, *e.ErrorsStruct)
 	}
 }
 
