@@ -36,7 +36,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Route("/v1", func(r chi.Router) {
 		r.Route("/auth", func(r chi.Router) {
 			r.Post("/user", s.registerUser)
-			// r.Post("/token", func(w http.ResponseWriter, r *http.Request) {})
+			r.Post("/token", s.loginUser)
 		})
 
 		//! from this point on, every route is protected

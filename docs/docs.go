@@ -9,13 +9,186 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "url": "http://www.swagger.io/support",
+            "email": "support@swagger.io"
+        },
+        "license": {
+            "name": "MIT ???",
+            "url": "https://opensource.org/license/mit"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/users/{id}": {
+        "/auth/token": {
+            "post": {
+                "description": "Creates a JWT with the fields \"email\" and \"username\" and returns its if its valid",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Generates a JWT based on user credentials",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.DataResponse-main_UserWithToken"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.DataResponse-er_ReturnedError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/main.DataResponse-er_ReturnedError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/main.DataResponse-er_ReturnedError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/main.DataResponse-er_ReturnedError"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/user": {
+            "post": {
+                "description": "Creates an user with the fields \"email\" and \"username\" and returns a jwt if its valid",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users",
+                    "auth"
+                ],
+                "summary": "Creates an user and returns JWT",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/main.DataResponse-main_UserWithToken"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.DataResponse-er_ReturnedError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/main.DataResponse-er_ReturnedError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/main.DataResponse-er_ReturnedError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/main.DataResponse-er_ReturnedError"
+                        }
+                    }
+                }
+            }
+        },
+        "/user": {
+            "get": {
+                "description": "Returns information about the same user if its authenticated",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Fetches your own profile",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.DataResponse-handlers_UserSchema"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.DataResponse-er_ReturnedError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/main.DataResponse-er_ReturnedError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/main.DataResponse-er_ReturnedError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/main.DataResponse-er_ReturnedError"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{id}": {
             "get": {
                 "security": [
                     {
@@ -46,25 +219,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handlers.UserSchema"
+                            "$ref": "#/definitions/main.DataResponse-handlers_UserSchema"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/er.ErrorsStruct"
+                            "$ref": "#/definitions/main.DataResponse-er_ReturnedError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/main.DataResponse-er_ReturnedError"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/er.ErrorsStruct"
+                            "$ref": "#/definitions/main.DataResponse-er_ReturnedError"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/er.ErrorsStruct"
+                            "$ref": "#/definitions/main.DataResponse-er_ReturnedError"
                         }
                     }
                 }
@@ -72,15 +251,25 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "er.ErrorsStruct": {
+        "er.ReturnedError": {
             "type": "object",
             "properties": {
-                "message": {},
-                "validationsErrors": {
+                "data": {
                     "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
+                    "properties": {
+                        "message": {
+                            "type": "string"
+                        },
+                        "validationsErrors": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
                     }
+                },
+                "error": {
+                    "type": "boolean"
                 }
             }
         },
@@ -100,6 +289,85 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "main.DataResponse-er_ReturnedError": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/er.ReturnedError"
+                },
+                "error": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "main.DataResponse-handlers_UserSchema": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/handlers.UserSchema"
+                },
+                "error": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "main.DataResponse-main_UserWithToken": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/main.UserWithToken"
+                },
+                "error": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "main.UserWithToken": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CreateUser": {
+            "type": "object",
+            "required": [
+                "email",
+                "username"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 3
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 3
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`
@@ -108,10 +376,10 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "",
 	Host:             "",
-	BasePath:         "",
+	BasePath:         "/v1",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "golang-http",
+	Description:      "A simple server, using a bunch of repos (linked in the readme.md) to guide myself into the backend world",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

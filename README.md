@@ -6,10 +6,10 @@ i used go-blueprint to give me a hand on the project structure
 - [x] psql connection
 - [ ] kafka
 - [ ] elastic search
-- [ ] swagger < **Doing** 🚧
-- [ ] ratelimiter
+- [x] swagger **kinda done??**
+- [ ] ratelimiter **<- priotize this**
 - [ ] docker
-- [ ] websockets
+- [ ] websockets **<- priotize this**
 - [ ] redis cache
 - [ ] migrations
 - [ ] logger

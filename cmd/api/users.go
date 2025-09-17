@@ -14,21 +14,22 @@ type userKey string
 
 const userCtx userKey = "userIdentifier"
 
-// !test
 // GetUser godoc
 //
+//	@Router			/user/{id} [get]
 //	@Summary		Fetches a user profile
+//	@Version		1.0
 //	@Description	Fetches a user profile by ID
 //	@Tags			users
 //	@Accept			json
 //	@Produce		json
 //	@Param			id	path		int	true	"User ID"
-//	@Success		200	{object}	d.UserSchema
-//	@Failure		400	{object}	er.ErrorsStruct
-//	@Failure		404	{object}	er.ErrorsStruct
-//	@Failure		500	{object}	er.ErrorsStruct
+//	@Failure		400	{object}	DataResponse[er.ReturnedError]
+//	@Failure		401	{object}	DataResponse[er.ReturnedError]
+//	@Failure		404	{object}	DataResponse[er.ReturnedError]
+//	@Failure		500	{object}	DataResponse[er.ReturnedError]
+//	@Success		200	{object}	DataResponse[d.UserSchema]
 //	@Security		ApiKeyAuth
-//	@Router			/v1/users/{id} [get]
 func (s *Server) getUser(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 
@@ -50,7 +51,20 @@ func (s *Server) getUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// ! get own user
+// getOwnUser godoc
+//
+//	@Router			/user [get]
+//	@Summary		Fetches your own profile
+//	@Version		1.0
+//	@Description	Returns information about the same user if its authenticated
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Failure		400	{object}	DataResponse[er.ReturnedError]
+//	@Failure		401	{object}	DataResponse[er.ReturnedError]
+//	@Failure		404	{object}	DataResponse[er.ReturnedError]
+//	@Failure		500	{object}	DataResponse[er.ReturnedError]
+//	@Success		200	{object}	DataResponse[d.UserSchema]
 func (s *Server) getOwnUser(w http.ResponseWriter, r *http.Request) {
 	u := s.getUserFromContext(r)
 

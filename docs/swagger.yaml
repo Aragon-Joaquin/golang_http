@@ -1,11 +1,18 @@
+basePath: /v1
 definitions:
-  er.ErrorsStruct:
+  er.ReturnedError:
     properties:
-      message: {}
-      validationsErrors:
-        additionalProperties:
-          type: string
+      data:
+        properties:
+          message:
+            type: string
+          validationsErrors:
+            additionalProperties:
+              type: string
+            type: object
         type: object
+      error:
+        type: boolean
     type: object
   handlers.UserSchema:
     properties:
@@ -18,10 +25,178 @@ definitions:
       username:
         type: string
     type: object
+  main.DataResponse-er_ReturnedError:
+    properties:
+      data:
+        $ref: '#/definitions/er.ReturnedError'
+      error:
+        type: boolean
+    type: object
+  main.DataResponse-handlers_UserSchema:
+    properties:
+      data:
+        $ref: '#/definitions/handlers.UserSchema'
+      error:
+        type: boolean
+    type: object
+  main.DataResponse-main_UserWithToken:
+    properties:
+      data:
+        $ref: '#/definitions/main.UserWithToken'
+      error:
+        type: boolean
+    type: object
+  main.UserWithToken:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      token:
+        type: string
+      username:
+        type: string
+    type: object
+  models.CreateUser:
+    properties:
+      email:
+        maxLength: 50
+        minLength: 3
+        type: string
+      username:
+        maxLength: 20
+        minLength: 3
+        type: string
+    required:
+    - email
+    - username
+    type: object
 info:
-  contact: {}
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: A simple server, using a bunch of repos (linked in the readme.md) to
+    guide myself into the backend world
+  license:
+    name: MIT ???
+    url: https://opensource.org/license/mit
+  termsOfService: http://swagger.io/terms/
+  title: golang-http
 paths:
-  /users/{id}:
+  /auth/token:
+    post:
+      consumes:
+      - application/json
+      description: Creates a JWT with the fields "email" and "username" and returns
+        its if its valid
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.DataResponse-main_UserWithToken'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.DataResponse-er_ReturnedError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/main.DataResponse-er_ReturnedError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.DataResponse-er_ReturnedError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.DataResponse-er_ReturnedError'
+      summary: Generates a JWT based on user credentials
+      tags:
+      - auth
+  /auth/user:
+    post:
+      consumes:
+      - application/json
+      description: Creates an user with the fields "email" and "username" and returns
+        a jwt if its valid
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateUser'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.DataResponse-main_UserWithToken'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.DataResponse-er_ReturnedError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/main.DataResponse-er_ReturnedError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.DataResponse-er_ReturnedError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.DataResponse-er_ReturnedError'
+      summary: Creates an user and returns JWT
+      tags:
+      - users
+      - auth
+  /user:
+    get:
+      consumes:
+      - application/json
+      description: Returns information about the same user if its authenticated
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.DataResponse-handlers_UserSchema'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.DataResponse-er_ReturnedError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/main.DataResponse-er_ReturnedError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.DataResponse-er_ReturnedError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.DataResponse-er_ReturnedError'
+      summary: Fetches your own profile
+      tags:
+      - users
+  /user/{id}:
     get:
       consumes:
       - application/json
@@ -38,22 +213,31 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handlers.UserSchema'
+            $ref: '#/definitions/main.DataResponse-handlers_UserSchema'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/er.ErrorsStruct'
+            $ref: '#/definitions/main.DataResponse-er_ReturnedError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/main.DataResponse-er_ReturnedError'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/er.ErrorsStruct'
+            $ref: '#/definitions/main.DataResponse-er_ReturnedError'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/er.ErrorsStruct'
+            $ref: '#/definitions/main.DataResponse-er_ReturnedError'
       security:
       - ApiKeyAuth: []
       summary: Fetches a user profile
       tags:
       - users
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
