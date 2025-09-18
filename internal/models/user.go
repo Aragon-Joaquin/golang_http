@@ -36,7 +36,7 @@ func (s *UserStore) Create(ctx context.Context, user *d.UserSchema) (*d.UserSche
 	}
 
 	query := `
-		SELECT * FROM CreateUser($1, $2);
+		SELECT id, username, email, created_at FROM CreateUser($1, $2);
 	`
 	args := []any{userCreate.Username, userCreate.Email}
 	var newUser d.UserSchema

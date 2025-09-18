@@ -38,7 +38,7 @@ type JWTCore struct {
 	SignedString string
 }
 
-func (j *JWTAuthenticator) GenerateToken(identifier int64) (string, error) {
+func (j *JWTAuthenticator) GenerateToken(identifier any) (string, error) {
 
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		//*JWT specification (RFC 7519) FIELDS

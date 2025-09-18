@@ -13,6 +13,7 @@ i used go-blueprint to give me a hand on the project structure
 - [ ] redis cache
 - [ ] migrations
 - [ ] logger
+- [ ] make public file server
 - [x] jwt/authentication
 
 **db name**: testgodb (yes, thats the name)

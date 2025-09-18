@@ -2,6 +2,7 @@ package main
 
 import (
 	er "golang-http/internal/errors"
+	"golang-http/internal/ws"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -19,6 +20,8 @@ var (
 
 func (s *Server) RegisterRoutes() http.Handler {
 	r := chi.NewRouter()
+	webSocket := ws.NewWebsocketServer()
+	go webSocket.RunHandlers()
 
 	r.Use(middleware.RequestID) //adds a unique counter for each request
 	r.Use(middleware.RealIP)
@@ -50,6 +53,10 @@ func (s *Server) RegisterRoutes() http.Handler {
 				r.Get("/", s.getOwnUser)
 				r.Get("/{id}", s.getUser)
 			})
+		})
+
+		r.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+			createConnection(webSocket, w, r)
 		})
 
 		r.NotFound(func(w http.ResponseWriter, r *http.Request) {

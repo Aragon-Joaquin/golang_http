@@ -80,6 +80,7 @@ func CheckForGenericErrors(err error) *ErrorsStruct {
 	case sql.ErrNoRows.Error():
 		return &ErrorsStruct{Message: NotFound}
 	default:
+		log.Printf("Unknown error: %s\n", err.Error())
 		return &ErrorsStruct{Message: Unknown}
 	}
 

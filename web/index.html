@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>WebSockets</title>
+	</head>
+	<body>
+		<div id="messages"></div>
+		<form id="form">
+			<input type="text" placeholder="send message" id="input-msg" />
+			<button type="submit">Send</button>
+		</form>
+		<script>
+			const ws = new WebSocket('wss://localhost:8080')
+
+			//! open up connection
+			ws.addEventListener('open', (e) => {
+				socket.send('opened', e)
+			})
+
+			// received msg
+			ws.addEventListener('message', (e) => {
+				const messages = document.getElementById('messages')
+				const node = document.createTextNode(e.data)
+				messages.appendChild(document.createElement('li').appendChild(node))
+			})
+
+			//! send message
+			document.getElementById('form').addEventListener('onsubmit', (e) => {
+				e.preventDefault()
+				ws.send(document.getElementById('input-msg').value)
+				document.getElementById('input-msg').value = ''
+			})
+
+			//! close connection
+			ws.addEventListener('close', (e) => {
+				console.log('closed.', e)
+			})
+		</script>
+	</body>
+</html>
