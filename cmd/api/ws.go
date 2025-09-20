@@ -34,4 +34,10 @@ func createConnection(wsServer *ws.WsServer, w http.ResponseWriter, r *http.Requ
 	go client.ReadPump()
 
 	wsServer.Register <- client
+
+	//wait if there's an error
+	wsErr := <-client.ErrorChan
+	client.Conn.WriteMessage(
+		websocket.CloseMessage,
+		websocket.FormatCloseMessage(websocket.CloseAbnormalClosure, wsErr.Error()))
 }

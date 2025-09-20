@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"bytes"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -21,16 +22,18 @@ const (
 )
 
 type Client struct {
-	conn     *websocket.Conn
-	wsServer *WsServer
-	send     chan []byte
+	Conn      *websocket.Conn
+	wsServer  *WsServer
+	send      chan []byte
+	ErrorChan chan error
 }
 
 func NewClient(conn *websocket.Conn, wsServer *WsServer) *Client {
 	return &Client{
-		conn:     conn,
-		wsServer: wsServer,
-		send:     make(chan []byte, 256),
+		Conn:      conn,
+		wsServer:  wsServer,
+		send:      make(chan []byte, 256),
+		ErrorChan: make(chan error),
 	}
 
 }
@@ -38,12 +41,26 @@ func NewClient(conn *websocket.Conn, wsServer *WsServer) *Client {
 func (c *Client) ReadPump() {
 	defer func() {
 		c.wsServer.unregister <- c
-		c.conn.Close()
+		c.Conn.Close()
 	}()
 
-	// c.conn.SetReadLimit(maxMessageSize)
-	// c.conn.SetReadDeadline(time.Now().Add(pongWait))
-	// c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+	c.Conn.SetReadLimit(maxMessageSize)              //maximum bytes of message
+	c.Conn.SetReadDeadline(time.Now().Add(pongWait)) //reading timeout in unix
+	c.Conn.SetPongHandler(func(string) error {
+		return c.Conn.SetReadDeadline(time.Now().Add(pongWait)) // this was changed. it returned nil
+	}) //server sends constantly pings to the clients, and immediately after clients need to respond with a "pong"
+
+	for {
+		_, message, err := c.Conn.ReadMessage()
+		if err != nil {
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				c.ErrorChan <- err
+			}
+			break
+		}
+		message = bytes.TrimSpace(bytes.ReplaceAll(message, []byte{'\n'}, []byte{' '}))
+		c.wsServer.broadcast <- message
+	}
 
 }
 
